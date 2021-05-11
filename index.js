@@ -107,9 +107,10 @@ const getLogs = async (query) => {
     }
 
     let hour = 1
-    const maxDuration = process.env.DURATION || 24
-    const intervalDur = process.env.INTERVAL || 3600000
-
+    const maxDuration = process.env.DURATION || 24 // hours
+    const intervalDur = process.env.INTERVAL || 60 // minutes
+    let iterations = (1000 * 60 * 60 * maxDuration) / (intervalDur * 1000 * 60)
+    console.log("iterations", iterations)
     const processResult = () => {
         const res = {
             segsUpload: segsUploadedResults,
@@ -130,7 +131,7 @@ const getLogs = async (query) => {
     const interval = setInterval(async () => {
         console.log(`fetching stats ${hour}/${maxDuration}`)
 
-        if (hour >= maxDuration) {
+        if (hour > iterations) {
             clearInterval(interval)
             processResult()
             return
