@@ -53,7 +53,7 @@ const getLogs = async (query) => {
         const numOrchs = await getLogs(`${region}-prod-livepeer-secondary-broadcaster Done fetching orch info`)
         const refreshCount = await getLogs(`${region}-prod-livepeer-secondary-broadcaster Starting session refresh`)
         const maxTranscodeRetries = await getLogs(`${region}-prod-livepeer-secondary-broadcaster Hit max transcode`)
-        const numRetries = await getLogs(`${region}-prod-livepeer-secondary-broadcaster Retrying current segment mid`)
+        const numRetries = await getLogs(`${region}-prod-livepeer-secondary-broadcaster Trying to transcode segment`)
 
         for (const log of segsUploaded.events) {
             if (parseInt(log.id, 10) <= segsUploadedLastSeenID) continue;
@@ -77,9 +77,9 @@ const getLogs = async (query) => {
     
         for (const log of refreshCount.events) {
             if (parseInt(log.id, 10) <= refreshCountLastSeenID) continue;
-            const label = log.message.match(/([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/g)
+            const label = log.message.match(/(manifestID=([\w\-]+))/g)
             if (label) {
-                const key = label[0]
+                const key = label[0].slice(11)
                 refreshCountResult[key] = 1 + (refreshCountResult[key] || 0);
                 refreshCountLastSeenID = parseInt(log.id, 10)
             }
@@ -87,9 +87,9 @@ const getLogs = async (query) => {
     
         for (const log of maxTranscodeRetries.events) {
             if (parseInt(log.id, 10) <= maxRetriesLastSeenID) continue;
-            const label = log.message.match(/([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/g)
+            const label = log.message.match(/(manifestID=([\w\-]+))/g)
             if (label) {
-                const key = label[0]
+                const key = label[0].slice(11)
                 maxRetriesResult[key] = 1 + (maxRetriesResult[key] || 0);
                 maxRetriesLastSeenID = parseInt(log.id, 10)
             }
@@ -97,9 +97,9 @@ const getLogs = async (query) => {
     
         for (const log of numRetries.events) {
             if (parseInt(log.id, 10) <= numRetriesLastSeenID) continue;
-            const label = log.message.match(/([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/g)
+            const label = log.message.match(/(manifestID=([\w\-]+))/g)
             if (label) {
-                const key = label[0]
+                const key = label[0].slice(11)
                 numRetriesResult[key] = 1 + (numRetriesResult[key] || 0);
                 numRetriesLastSeenID = parseInt(log.id, 10)
             }
