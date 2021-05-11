@@ -139,6 +139,6 @@ const getLogs = async (query) => {
 
         await getData()
         hour++
-    }, intervalDur)
+    }, intervalDur*1000*60)
     
 })()
